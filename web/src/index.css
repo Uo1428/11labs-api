@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+
+:root {
+  --background: #151515;
+  --foreground: oklch(96% 0 0);
+  --card: #1c1c1c;
+  --card-foreground: oklch(96% 0 0);
+  --popover: #1c1c1c;
+  --popover-foreground: oklch(96% 0 0);
+  --primary: oklch(72% 0.16 290);
+  --primary-foreground: oklch(15% 0 0);
+  --secondary: #1c1c1c;
+  --secondary-foreground: oklch(96% 0 0);
+  --muted: #1c1c1c;
+  --muted-foreground: oklch(62% 0 0);
+  --accent: oklch(72% 0.16 290);
+  --accent-foreground: oklch(15% 0 0);
+  --destructive: oklch(62% 0.22 25);
+  --border: rgb(255 255 255 / 0.05);
+  --border-strong: rgb(255 255 255 / 0.12);
+  --input: rgb(255 255 255 / 0.05);
+  --ring: oklch(72% 0.16 290 / 0.55);
+  --success: oklch(72% 0.18 150);
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  @apply bg-background text-foreground font-sans antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded-full;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+audio {
+  @apply accent-primary;
+}

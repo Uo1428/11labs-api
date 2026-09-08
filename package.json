@@ -1,0 +1,11 @@
+{
+  "name": "11labs-api",
+  "private": true,
+  "workspaces": ["server", "web"],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:server": "bun run --filter server dev",
+    "dev:web": "bun run --filter web dev",
+    "typecheck": "bun run --filter '*' typecheck"
+  }
+}

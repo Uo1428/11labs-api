@@ -87,6 +87,41 @@ curl -X POST http://localhost:8787/api/accounts \
   -d '{"label": "Pro plan", "refreshToken": "<your-el-token>"}'
 ```
 
+### Grab a refresh token
+
+Each account needs its ElevenLabs **refresh token**. Sign in to [elevenlabs.io](https://elevenlabs.io) in your browser, open DevTools → **Console**, and paste:
+
+```js
+(() => {
+  const found = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith("firebase:authUser:")) continue;
+    try {
+      const d = JSON.parse(localStorage.getItem(key));
+      const t = d && d.stsTokenManager;
+      found.push({
+        key,
+        email: (d.providerData?.[0]?.email) || d.email || "?",
+        name: d.displayName || "",
+        refreshToken: t?.refreshToken || null,
+        expires: t?.expirationTime ? new Date(t.expirationTime).toLocaleString() : null,
+      });
+    } catch (e) { console.warn("skip", key, e); }
+  }
+  if (!found.length) { console.error("No Firebase auth found in localStorage — are you logged in?"); return; }
+  console.table(found.map(f => ({ ...f, refreshToken: f.refreshToken ? f.refreshToken.slice(0, 32) + "…" : null })));
+  const acc = found.find(f => f.refreshToken) || found[0];
+  if (acc?.refreshToken) {
+    navigator.clipboard.writeText(acc.refreshToken)
+      .then(() => console.log("%c✓ refresh token copied to clipboard — paste into the app's +Add form", "color:lime"))
+      .catch(() => console.log("Manual copy:\n" + acc.refreshToken));
+  }
+})();
+```
+
+It lists any signed-in accounts and copies the refresh token to your clipboard — paste it into the dashboard's **+Add** form.
+
 ### Generate speech
 
 ```bash

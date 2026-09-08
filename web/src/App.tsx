@@ -7,12 +7,13 @@ import { HistoryTab } from "./components/HistoryTab";
 import { VoicesTab } from "./components/VoicesTab";
 import { ApiKeysTab } from "./components/ApiKeysTab";
 import { UsageTab } from "./components/UsageTab";
+import { HealthTab } from "./components/HealthTab";
 import { DocsTab } from "./components/DocsTab";
 import { AdminGate } from "./components/AdminGate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Button } from "./components/ui/button";
 
-type Tab = "studio" | "history" | "voices" | "api-keys" | "usage" | "docs";
+type Tab = "studio" | "history" | "voices" | "api-keys" | "usage" | "health" | "docs";
 type AuthState = "checking" | "locked" | "open";
 
 const TABS: { id: Tab; label: string }[] = [
@@ -21,6 +22,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "voices", label: "Voices" },
   { id: "api-keys", label: "API Keys" },
   { id: "usage", label: "Usage" },
+  { id: "health", label: "Health" },
   { id: "docs", label: "API Docs" },
 ];
 
@@ -141,6 +143,9 @@ export default function App() {
             </TabsContent>
             <TabsContent value="usage" className="mt-0">
               <UsageTab />
+            </TabsContent>
+            <TabsContent value="health" className="mt-0">
+              <HealthTab />
             </TabsContent>
             <TabsContent value="docs" className="mt-0">
               <DocsTab />

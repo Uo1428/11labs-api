@@ -22,8 +22,8 @@ import {
   enqueue,
   UpstreamError,
 } from "./upstream";
-import { cachedTokenState } from "./firebase";
-import type { Account, AccountView } from "./types";
+import { cachedTokenState, getAccessToken, invalidate } from "./firebase";
+import type { Account, AccountView, SubscriptionInfo } from "./types";
 import {
   init as initKeys,
   authenticate,
@@ -248,6 +248,61 @@ app.delete("/api/logs", requireAdmin, (_req, res) => {
   res.status(204).end();
 });
 
+// ---- account health (admin only) ----
+
+app.get("/api/admin/health", requireAdmin, async (_req, res) => {
+  const DAY = 86_400_000;
+  const out = await Promise.all(
+    listAccounts().map(async (a) => {
+      let subscription: SubscriptionInfo | null = null;
+      try {
+        subscription = await getSubscription(a);
+      } catch {
+        // keep null
+      }
+      const lastError = getLastErrorForAccount(a.id);
+      const lastUsed = getLastUsageForAccount(a.id);
+      return {
+        id: a.id,
+        label: a.label,
+        email: a.email ?? null,
+        active: a.active,
+        subscription,
+        token: cachedTokenState(a.id),
+        errors24h: countErrorsForAccount(a.id, DAY),
+        lastError: lastError
+          ? { ts: lastError.ts, status: lastError.status, message: lastError.message }
+          : null,
+        lastUsed: lastUsed
+          ? { ts: lastUsed.ts, path: lastUsed.path, chars: lastUsed.chars }
+          : null,
+      };
+    }),
+  );
+  res.json(out);
+});
+
+// Force-refresh an account's access token and re-validate it end-to-end.
+app.post("/api/admin/accounts/:id/refresh", requireAdmin, async (req, res) => {
+  const account = getAccount(req.params.id);
+  if (!account) return res.status(404).json({ error: "account not found" });
+  invalidate(account.id);
+  try {
+    await getAccessToken(account);
+    await upstreamFetch(account, "/v1/auth-account");
+    const subscription = await getSubscription(account, true);
+    res.json({ ok: true, tokenValid: true, subscription });
+  } catch (e) {
+    const status = e instanceof UpstreamError ? e.status : 502;
+    recordError(req, e, status);
+    res.status(502).json({
+      ok: false,
+      tokenValid: false,
+      error: e instanceof Error ? e.message : String(e),
+    });
+  }
+});
+
 // ---- accounts (admin only) ----
 
 app.use("/api/accounts", requireAdmin);
@@ -330,7 +385,7 @@ app.get("/api/subscription", async (req, res) => {
 app.get("/api/voices", async (req, res) => {
   try {
     const account = await resolveAccount(req);
-    await jsonRoute(res, "/v1/voices", account);
+    await cachedJson(res, `voices:${account.id}`, account, "/v1/voices");
   } catch (e) {
     sendError(req, res, e);
   }
@@ -339,7 +394,7 @@ app.get("/api/voices", async (req, res) => {
 app.get("/api/voices/collections", async (req, res) => {
   try {
     const account = await resolveAccount(req);
-    await jsonRoute(res, "/v1/voices/collections", account);
+    await cachedJson(res, "voices:collections", account, "/v1/voices/collections");
   } catch (e) {
     sendError(req, res, e);
   }
@@ -348,7 +403,12 @@ app.get("/api/voices/collections", async (req, res) => {
 app.get("/api/voices/:id/settings", async (req, res) => {
   try {
     const account = await resolveAccount(req);
-    await jsonRoute(res, `/v1/voices/${req.params.id}/settings`, account);
+    await cachedJson(
+      res,
+      `voice-settings:${account.id}:${req.params.id}`,
+      account,
+      `/v1/voices/${req.params.id}/settings`,
+    );
   } catch (e) {
     sendError(req, res, e);
   }
@@ -360,11 +420,8 @@ app.get("/api/shared-voices", async (req, res) => {
     const sort = req.query.sort ?? "trending";
     const page = req.query.page ?? "1";
     const pageSize = req.query.page_size ?? "30";
-    await jsonRoute(
-      res,
-      `/v1/shared-voices?sort=${sort}&page=${page}&page_size=${pageSize}&explore_source=tts_explore_tab`,
-      account,
-    );
+    const path = `/v1/shared-voices?sort=${sort}&page=${page}&page_size=${pageSize}&explore_source=tts_explore_tab`;
+    await cachedJson(res, `shared-voices:${path}`, account, path);
   } catch (e) {
     sendError(req, res, e);
   }
@@ -373,46 +430,64 @@ app.get("/api/shared-voices", async (req, res) => {
 // ---- TTS ----
 
 app.post("/api/tts/:voiceId/stream", async (req, res) => {
-  let account: Account;
+  const mode = (req.header("x-account") ?? "auto").trim();
+  const estimate = estimateFromText(req.body?.text ?? "");
+
+  let accounts: Account[];
   try {
-    account = await resolveAccount(req);
+    if (mode === "auto") {
+      accounts = await rankAccounts(estimate);
+    } else {
+      const a = resolveAccountById(mode);
+      (req as any)._account = a;
+      accounts = [a];
+    }
   } catch (e) {
     return sendError(req, res, e);
   }
 
-  const estimate = estimateFromText(req.body?.text ?? "");
-  try {
-    const before = await getSubscription(account);
-    const up = await enqueue(account.id, () =>
-      upstreamFetch(account, `/v1/text-to-speech/${req.params.voiceId}/stream`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(req.body ?? {}),
-      }),
-    );
+  let lastError: unknown = null;
+  for (const account of accounts) {
+    try {
+      const before = await getSubscription(account);
+      const up = await enqueue(account.id, () =>
+        upstreamFetch(account, `/v1/text-to-speech/${req.params.voiceId}/stream`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(req.body ?? {}),
+        }),
+      );
 
-    const characterCost = Number(up.headers.get("character-cost") ?? estimate);
-    applyCreditDelta(account.id, characterCost);
-    res.locals.chars = characterCost;
+      const characterCost = Number(up.headers.get("character-cost") ?? estimate);
+      applyCreditDelta(account.id, characterCost);
+      res.locals.chars = characterCost;
+      (req as any)._account = account;
 
-    res.setHeader("content-type", up.headers.get("content-type") ?? "audio/mpeg");
-    res.setHeader("x-account-id", account.id);
-    res.setHeader("x-account-label", account.label ?? account.email ?? "Account");
-    res.setHeader("x-character-cost", String(characterCost));
-    res.setHeader("x-credit-remaining", String(Math.max(0, before.remaining - characterCost)));
-    for (const h of [
-      "history-item-id",
-      "request-id",
-      "current-concurrent-requests",
-      "maximum-concurrent-requests",
-    ]) {
-      const v = up.headers.get(h);
-      if (v) res.setHeader(h, v);
+      res.setHeader("content-type", up.headers.get("content-type") ?? "audio/mpeg");
+      res.setHeader("x-account-id", account.id);
+      res.setHeader("x-account-label", account.label ?? account.email ?? "Account");
+      res.setHeader("x-character-cost", String(characterCost));
+      res.setHeader("x-credit-remaining", String(Math.max(0, before.remaining - characterCost)));
+      for (const h of [
+        "history-item-id",
+        "request-id",
+        "current-concurrent-requests",
+        "maximum-concurrent-requests",
+      ]) {
+        const v = up.headers.get(h);
+        if (v) res.setHeader(h, v);
+      }
+      Readable.fromWeb(up.body as never).pipe(res);
+      return;
+    } catch (e) {
+      lastError = e;
+      const status = e instanceof UpstreamError ? e.status : 500;
+      recordError(req, e, status);
+      // auto mode: try the next account in the pool
+      if (mode !== "auto") break;
     }
-    Readable.fromWeb(up.body as never).pipe(res);
-  } catch (e) {
-    sendError(req, res, e);
   }
+  sendError(req, res, lastError);
 });
 
 // ---- history ----

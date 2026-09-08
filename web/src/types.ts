@@ -72,6 +72,18 @@ export interface ErrorLog {
   stack?: string;
 }
 
+export interface AccountHealth {
+  id: string;
+  label: string;
+  email: string | null;
+  active: boolean;
+  subscription: Subscription | null;
+  token: "valid" | "expired" | "none";
+  errors24h: number;
+  lastError: { ts: number; status: number; message: string } | null;
+  lastUsed: { ts: number; path: string; chars: number } | null;
+}
+
 export interface Voice {
   voice_id: string;
   name: string;

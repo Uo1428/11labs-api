@@ -62,6 +62,52 @@ You talk to **one** API. The gateway talks to **all** your accounts and makes it
 | 💾 | **Voice caching** | Voices/settings cached 10 min — fewer upstream calls |
 | 🩺 | **Health panel** | Token state, credits, last error for every account at a glance |
 
+## 🗺️ The road ahead
+
+Right now this gateway speaks **one language**: text-to-speech. But ElevenLabs is a **full creative engine** — and this is just the beginning. Every star unlocks the next milestone on the path to a complete AI media gateway. 🚀
+
+<details>
+<summary><b>🎯 Milestone 1 — Proxy Speech-to-Text (STT)</b> · unlocks at <b>10 ⭐</b></summary>
+
+Route ElevenLabs **transcription** through the exact same routing, failover, and usage pipeline as TTS. One gateway to **listen** and **speak**.
+
+> _Turn your voice into text, and text back into voice — through a single clean API._
+</details>
+
+<details>
+<summary><b>🎼 Milestone 2 — AI Music Generation</b> · unlocks at <b>25 ⭐</b></summary>
+
+Pool the ElevenLabs **music** API across your accounts. Generate instrumentals, ambient loops, and full tracks — with per-key credit tracking.
+
+> _From a whisper to a symphony — all through your gateway._
+</details>
+
+<details>
+<summary><b>🎨 Milestone 3 — AI Image Generation</b> · unlocks at <b>50 ⭐</b></summary>
+
+Route ElevenLabs **image models** with the same smart routing and credit tracking. Generate art, thumbnails, and cover art alongside your audio.
+
+> _Give your gateway eyes as well as a voice._
+</details>
+
+<details>
+<summary><b>🎬 Milestone 4 — AI Video Generation</b> · unlocks at <b>100 ⭐</b></summary>
+
+The full ElevenLabs **video pipeline** — TTS + sound effects + visuals — unified into one request flow. Generate complete videos from a single prompt.
+
+> _The endgame: one API that creates entire media productions._
+</details>
+
+<details>
+<summary><b>💥 Milestone 5 — Sound Effects</b> · unlocks at <b>150 ⭐</b></summary>
+
+Proxy SFX **generation and mixing** into the gateway. Add foley, ambience, and impacts to any generated media.
+
+> _Every scene, every punch, every whoosh — generated on demand._
+</details>
+
+> ⭐ **Star-powered development.** Every star is a vote for what ships next. Star the repo to help unlock the next milestone. 🚀
+
 ## 🚀 Quick start
 
 **You need:** [Bun](https://bun.sh) installed.
@@ -211,55 +257,3 @@ Every request needs `x-admin-key` or `x-api-key`.
 
 **Runtime** · Bun · TypeScript · Express
 **Frontend** · React 19 · Vite 6 · Tailwind CSS v4 · Motion · lucide-react
-
-## 🗺️ The road ahead
-
-Right now this gateway speaks **one language**: text-to-speech. But ElevenLabs is a **full creative engine** — and this is just the beginning. Every star unlocks the next milestone on the path to a complete AI media gateway. 🚀
-
-<details>
-<summary><b>🎯 Milestone 1 — Proxy Speech-to-Text (STT)</b> · unlocks at <b>10 ⭐</b></summary>
-
-Route ElevenLabs **transcription** through the exact same routing, failover, and usage pipeline as TTS. One gateway to **listen** and **speak**.
-
-> _Turn your voice into text, and text back into voice — through a single clean API._
-</details>
-
-<details>
-<summary><b>🎼 Milestone 2 — AI Music Generation</b> · unlocks at <b>25 ⭐</b></summary>
-
-Pool the ElevenLabs **music** API across your accounts. Generate instrumentals, ambient loops, and full tracks — with per-key credit tracking.
-
-> _From a whisper to a symphony — all through your gateway._
-</details>
-
-<details>
-<summary><b>🎨 Milestone 3 — AI Image Generation</b> · unlocks at <b>50 ⭐</b></summary>
-
-Route ElevenLabs **image models** with the same smart routing and credit tracking. Generate art, thumbnails, and cover art alongside your audio.
-
-> _Give your gateway eyes as well as a voice._
-</details>
-
-<details>
-<summary><b>🎬 Milestone 4 — AI Video Generation</b> · unlocks at <b>100 ⭐</b></summary>
-
-The full ElevenLabs **video pipeline** — TTS + sound effects + visuals — unified into one request flow. Generate complete videos from a single prompt.
-
-> _The endgame: one API that creates entire media productions._
-</details>
-
-<details>
-<summary><b>💥 Milestone 5 — Sound Effects</b> · unlocks at <b>150 ⭐</b></summary>
-
-Proxy SFX **generation and mixing** into the gateway. Add foley, ambience, and impacts to any generated media.
-
-> _Every scene, every punch, every whoosh — generated on demand._
-</details>
-
----
-
-### ⭐ Star-powered development
-
-Each milestone is **gated on stars** — your ⭐ is literally a vote for what ships next. The more this repo grows, the faster the gateway evolves from a TTS proxy into a **complete AI media studio**.
-
-> **Star this repo** and help decide which milestone unlocks first. Every star counts. 🚀

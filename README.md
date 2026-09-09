@@ -19,6 +19,12 @@ A private, self-hosted gateway that pools your ElevenLabs accounts behind a sing
 
 ---
 
+## 🎬 Demo
+
+[▶️ Watch the demo video](assets/demo.mp4)
+
+---
+
 ## 🤔 The problem
 
 You have a handful of ElevenLabs accounts. Now you want to:

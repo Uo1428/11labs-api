@@ -33,7 +33,6 @@ export default function App() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [accountMode, setAccountMode] = useState("auto");
   const [tab, setTab] = useState<Tab>("studio");
-
   const refreshAccounts = useCallback(async () => {
     try {
       const data = await (await api("/accounts")).json();

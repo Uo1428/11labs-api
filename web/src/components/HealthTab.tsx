@@ -6,6 +6,7 @@ import { AnimatedBadge } from "./ui/animated-badge";
 import { motion } from "motion/react";
 import { Activity, HeartPulse, Loader2, RefreshCw, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSafeMode, maskEmail } from "@/lib/safe-mode";
 
 function initials(name: string) {
   return (
@@ -82,6 +83,7 @@ export function HealthTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<string | null>(null);
+  const { safeMode } = useSafeMode();
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -189,7 +191,11 @@ export function HealthTab() {
                         {a.active ? "Active" : "Paused"}
                       </span>
                     </div>
-                    {a.email && <p className="truncate text-[11px] text-muted-foreground">{a.email}</p>}
+                    {a.email && (
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {safeMode ? maskEmail(a.email) : a.email}
+                      </p>
+                    )}
                   </div>
                   <div className="flex shrink-0 items-center gap-1.5">
                     <TokenBadge token={a.token} />

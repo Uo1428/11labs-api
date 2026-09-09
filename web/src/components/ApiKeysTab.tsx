@@ -10,6 +10,7 @@ import { motion } from "motion/react";
 import { Check, Copy, KeyRound, Loader2, Plus, Trash2 } from "lucide-react";
 import { SPRING_LAYOUT } from "@/lib/ease";
 import { cn } from "@/lib/utils";
+import { useSafeMode, maskToken } from "@/lib/safe-mode";
 
 function fmtDate(ts: number | null) {
   if (!ts) return "never";
@@ -24,6 +25,7 @@ export function ApiKeysTab() {
   const [created, setCreated] = useState<CreatedApiKey | null>(null);
   const [createState, setCreateState] = useState<"idle" | "loading">("idle");
   const [copied, setCopied] = useState(false);
+  const { safeMode } = useSafeMode();
 
   const refresh = useCallback(async () => {
     try {
@@ -137,7 +139,7 @@ export function ApiKeysTab() {
             </p>
             <div className="mt-2 flex items-center gap-2">
               <code className="min-w-0 flex-1 break-all rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-foreground">
-                {created.token}
+                {safeMode ? maskToken("token") : created.token}
               </code>
               <Button variant="secondary" size="sm" onClick={copyToken} className="shrink-0">
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
@@ -181,7 +183,7 @@ export function ApiKeysTab() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-medium text-foreground">{k.name}</p>
+                    <p className="truncate text-sm font-medium text-foreground">{safeMode ? maskToken(k.name) : k.name}</p>
                     <AnimatedBadge
                       status={k.active ? "success" : "neutral"}
                       size="sm"
@@ -191,7 +193,7 @@ export function ApiKeysTab() {
                     </AnimatedBadge>
                   </div>
                   <code className="mt-1 block font-mono text-[11px] text-muted-foreground">
-                    {k.hint}
+                    {safeMode ? maskToken(k.hint) : k.hint}
                   </code>
                   <p className="mt-2 text-[11px] text-muted-foreground">
                     Created {fmtDate(k.createdAt)} · Last used {fmtDate(k.lastUsedAt)}

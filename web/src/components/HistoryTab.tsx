@@ -7,6 +7,7 @@ import { AudioPlayer } from "./ui/audio-player";
 import { motion } from "motion/react";
 import { History, Play, Square, Trash2 } from "lucide-react";
 import { SPRING_LAYOUT } from "@/lib/ease";
+import { useSafeMode } from "@/lib/safe-mode";
 
 function formatDate(unix: number) {
   return new Date(unix * 1000).toLocaleString();
@@ -18,6 +19,7 @@ export function HistoryTab({ accountMode }: { accountMode: string }) {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { safeMode } = useSafeMode();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -99,7 +101,9 @@ export function HistoryTab({ accountMode }: { accountMode: string }) {
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="line-clamp-2 text-sm text-foreground">{it.text ?? "(no text)"}</p>
+              <p className="line-clamp-2 text-sm text-foreground">
+                {safeMode ? "•••• •••• ••••" : it.text ?? "(no text)"}
+              </p>
               <div className="mt-1.5 flex flex-wrap items-center gap-2">
                 <AnimatedBadge status="neutral" size="sm" showIcon={false}>
                   {it.voice_name ?? it.voice_id ?? "unknown voice"}

@@ -211,3 +211,17 @@ Every request needs `x-admin-key` or `x-api-key`.
 
 **Runtime** · Bun · TypeScript · Express
 **Frontend** · React 19 · Vite 6 · Tailwind CSS v4 · Motion · lucide-react
+
+## 🗺️ Roadmap
+
+Prioritized by impact — each item unlocks when the repo hits its **star threshold**. ⭐
+
+| Priority | Feature | Unlocks at |
+|---|---|---|
+| 1 | **Proxy Speech-to-Text (STT)** — route ElevenLabs transcription through the same routing/failover/usage pipeline | 10 ⭐ |
+| 2 | **AI Music Generation** — pool ElevenLabs music API across accounts | 25 ⭐ |
+| 3 | **AI Image Generation** — route ElevenLabs image models with credit tracking | 50 ⭐ |
+| 4 | **AI Video Generation** — full ElevenLabs video pipeline (TTS + sound effects + visuals) | 100 ⭐ |
+| 5 | **Sound Effects** — proxy SFX generation and mixing into the gateway | 150 ⭐ |
+
+> ⭐ **Star-powered development.** Every milestone unlocks the next feature. Star the repo and vote on what ships next!

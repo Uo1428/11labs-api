@@ -2,6 +2,8 @@
 
 # 🎙️ 11Labs API Gateway
 
+> **For educational purposes only.** Use only with accounts you own, and respect ElevenLabs' Terms of Service.
+
 **One API. Every ElevenLabs account you own. Zero shared passwords.**
 
 A private, self-hosted gateway that pools your ElevenLabs accounts behind a single clean API — with automatic failover, per-key billing, and a dashboard that actually shows you what's happening.

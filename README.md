@@ -19,9 +19,13 @@ A private, self-hosted gateway that pools your ElevenLabs accounts behind a sing
 
 ---
 
+
 ## 🎬 Demo
 
+<img width="1882" height="947" alt="image" src="https://github.com/user-attachments/assets/fb44a380-2c21-43dd-9ee3-a10e1ec38ae7" />
+
 [▶️ Watch the demo video](assets/demo.mp4)
+
 
 ---
 
